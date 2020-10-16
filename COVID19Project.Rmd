@@ -1,0 +1,23 @@
+---
+title: "COVID-19"
+# yaml-author
+date: 2020-06-05
+output: github_document
+---
+  
+  *Purpose*: Something about COVID-19.
+
+
+*Notes*:
+- I had trouble running the Case study in my browser. Note that the `who` dataset is loaded by the `tidyverse`. You can run the Case study locally if you need to!
+- The case study uses `gather` instead of `pivot_longer`; feel free to use `pivot_longer` in place.
+
+```{r setup, include=FALSE}
+# knitr options
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library}
+library(tidyverse)
+
+```
