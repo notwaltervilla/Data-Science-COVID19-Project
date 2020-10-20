@@ -27,9 +27,66 @@ plot(pressure)
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
+```{r load libraries}
+library(tidyr)
+library(tidyverse)
+```
+
 ## COVID19 DataSets 
 
-```{r}
-legalOperatingBusinesses <- read.csv()/home/notwaltervilla/data-science
+```{r load data set}
+amazon_sales_covid19 <- read.csv("/home/notwaltervilla/data-science-projects/Data-Science-COVID19-Project/amazon_2020sales.csv")
+summary(amazon_sales_covid19);
+amazon_sales_covid19;
 ```
+```{r wrangle some mf data}
+amazon_sales_data_properties<- amazon_sales_covid19 %>% 
+  subset(select = -c(product.url, image.url, product.description, X, X.1, X.2, X.3, X.4, X.5))
+  ##
+
+amazon_sales_data_properties
+```
+
+```{r drop NA values}
+amazon_sales_data_properties %>% 
+  drop_na(sale.price)
+```
+```{r simple plot}
+amazon_sales_data_properties %>% 
+  filter(number.of.reviews > 0) %>% 
+  
+
+
+# lookforItem <- function(item){
+#   return (item == "Mask") 
+# }
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
