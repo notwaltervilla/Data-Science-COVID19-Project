@@ -41,4 +41,12 @@ newDataSet <- inner_join(df_covid, df_airquality2020, by = NULL)
 newDataSet #This is the joined version of the COVID-19 and EPA data set
 
 ```
+```{r plot1}
+
+newDataSet %>% 
+  filter(State == "New York") %>% 
+  ggplot() + 
+  geom_point(mapping = aes(x = confirmed_cases, y = Median.AQI, color = County))
+
+```
 
