@@ -1,0 +1,93 @@
+---
+title: "personal_income"
+author: "Jonas"
+date: "10/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup}
+library(tidyverse)
+
+```
+
+
+## R Markdown
+
+
+
+```{r load data}
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
+df_inc_dirty <- read.csv("data/Personal_Income.csv")
+filename_nyt <- "./data/nyt_counties.csv"
+
+## Download the data locally
+curl::curl_download(
+        url_counties,
+        destfile = filename_nyt
+      )
+
+## Loads the downloaded csv
+df_covid <- read_csv(filename_nyt)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r glimpse}
+df_covid %>% glimpse()
+df_inc_dirty %>% glimpse()
+
+```
+
+```{r}
+df_inc <- df_inc_dirty %>% 
+  rename("Type" = X) %>%
+  pivot_longer(-"Type", names_to = "Month")
+
+
+df_inc
+```
+
+
+```{r}
+df_inc %>%
+  filter(Type == "Personal income") %>%
+  ggplot() +
+  geom_point(aes(Month, value))
+```
+a. What’s your question?
+
+How does covid-19 cases by state relate to personal income?
+or
+How does a state's response to covid-19 affect personal income?
+
+b. What data do you plan to use to answer this question?
+
+https://www.bea.gov/data/income-saving/personal-income
+https://www.bea.gov/data/income-saving/personal-income-by-state
+
+c. What challenges do you anticipate encountering?
+
+We only have data on personal income by state for q1 and q2, so we may run out of things to relate 
+
+d. What level of complexity of final product are you aiming for?
+
+1 being MVP, 5 being above and beyond 
+2.5
+
+e. What figures / tables do you anticipate producing?
+
+state case trend and q1 to q2 income change
+Historical trend and patterns of income
+Comparison of effects across states - relate to states response?
+
+
+
+
+
