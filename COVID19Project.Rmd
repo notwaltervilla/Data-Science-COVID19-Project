@@ -5,7 +5,7 @@ date: 2020-06-05
 output: github_document
 ---
   
-  *Purpose*: Something about COVID-19.
+*Purpose*: Something about COVID-19.
 
 
 *Notes*:
