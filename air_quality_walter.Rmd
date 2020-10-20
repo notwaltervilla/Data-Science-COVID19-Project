@@ -1,0 +1,44 @@
+---
+title: "Air Quality Data - Shawn, Jonas, and Walter"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+```{r loading libraries}
+library(tidyverse)
+library(tidyr)
+
+df_airquality2020<- read.csv("/home/notwaltervilla/data-science-projects/Data-Science-COVID19-Project/data/annual_aqi_by_county_2020.csv")
+df_airquality2020
+```
+## NOTE ==  AQI (air quality index) - Bigger is worst 
+
+```{r loading NewYorkTimes data}
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
+filename_nyt <- "./data/nyt_counties.csv"
+
+## Download the data locally
+curl::curl_download(
+        url_counties,
+        destfile = filename_nyt
+      )
+
+## Loads the downloaded csv
+df_covid <- read_csv(filename_nyt)
+df_covid
+```
+```{r wrangling data}
+names(df_covid)[2] <- "County"
+names(df_covid)[3] <- "State"
+newDataSet <- inner_join(df_covid, df_airquality2020, by = NULL)
+newDataSet #This is the joined version of the COVID-19 and EPA data set
+
+```
+
