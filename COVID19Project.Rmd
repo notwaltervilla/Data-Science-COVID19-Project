@@ -1,12 +1,11 @@
 ---
-title: "COVID-19"
+title: "Air Quality Data - Shawn, Jonas, and Walter"
 # yaml-author
 date: 2020-06-05
 output: github_document
 ---
   
 *Purpose*: Something about COVID-19.
-
 
 *Notes*:
 - I had trouble running the Case study in my browser. Note that the `who` dataset is loaded by the `tidyverse`. You can run the Case study locally if you need to!
@@ -17,14 +16,21 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+We load the libraries here: 
+
 ```{r library}
 library(tidyverse)
-
+library(tidyr)
 ```
-
-
+We load the our datasets here: 
 
 ```{r load data}
+
+#Loading EPA Air Quality Data
+df_airquality2020<- read.csv("/home/notwaltervilla/data-science-projects/Data-Science-COVID19-Project/data/annual_aqi_by_county_2020.csv")
+df_airquality2020
+
+#Load NYTimes Data - using code from c06
 url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
 filename_nyt <- "./data/nyt_counties.csv"
 
@@ -36,4 +42,22 @@ curl::curl_download(
 
 ## Loads the downloaded csv
 df_covid <- read_csv(filename_nyt)
+df_covid
 ```
+
+```{r wrangling data}
+names(df_covid)[2] <- "County"
+names(df_covid)[3] <- "State"
+newDataSet <- inner_join(df_covid, df_airquality2020, by = NULL)
+newDataSet #This is the joined version of the COVID-19 and EPA data set
+
+```
+
+
+
+
+
+
+
+
+
