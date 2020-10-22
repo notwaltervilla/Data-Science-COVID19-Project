@@ -27,7 +27,7 @@ We load the our datasets here:
 ```{r load data}
 
 #Loading EPA Air Quality Data
-df_airquality2020<- read.csv("/home/notwaltervilla/data-science-projects/Data-Science-COVID19-Project/data/annual_aqi_by_county_2020.csv")
+df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
 df_airquality2020
 
 #Load NYTimes Data - using code from c06
