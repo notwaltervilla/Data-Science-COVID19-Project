@@ -5,7 +5,9 @@ date: 2020-06-05
 output: github_document
 ---
   
-*Purpose*: Something about COVID-19.
+*Purpose*: To answer the question: Is there a correlation between covid outcomes and air quality?
+
+*Background*:
 
 *Notes*:
 - I had trouble running the Case study in my browser. Note that the `who` dataset is loaded by the `tidyverse`. You can run the Case study locally if you need to!
@@ -48,8 +50,8 @@ df_covid
 ```{r wrangling data}
 names(df_covid)[2] <- "County"
 names(df_covid)[3] <- "State"
-newDataSet <- inner_join(df_covid, df_airquality2020, by = NULL)
-newDataSet #This is the joined version of the COVID-19 and EPA data set
+df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
+df_covid_air #This is the joined version of the COVID-19 and EPA data set
 
 ```
 

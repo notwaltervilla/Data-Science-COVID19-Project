@@ -7,24 +7,63 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r load data}
 
-```{r cars}
-summary(cars)
+#Loading EPA Air Quality Data
+df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2020
+
+#Load NYTimes Data - using code from c06
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
+filename_nyt <- "./data/nyt_counties.csv"
+
+## Download the data locally
+curl::curl_download(
+        url_counties,
+        destfile = filename_nyt
+      )
+
+## Loads the downloaded csv
+df_covid <- read_csv(filename_nyt)
+df_covid
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+```{r wrangling data}
+names(df_covid)[2] <- "County"
+names(df_covid)[3] <- "State"
+df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
+df_covid_air #This is the joined version of the COVID-19 and EPA data set
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+df_covid_air %>%
+  filter(State == "Alabama")  %>%
+  summarise(a = Median.AQI, y = cases, County = County) %>%
+  ggplot() +
+  geom_point(aes(a, y, color = County))
+  
+ # ggplot() +
+#  geom_line(aes("Median.AQI", "confirmed_cases", color = County))
+
+
+```
+
+
+  
+  ggplot() +
+  geom_point(aes(x = cases, y = "Median.AQI")) +
+  facet_grid(~County)
+
+
+
+
+
