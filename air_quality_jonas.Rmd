@@ -43,25 +43,90 @@ df_covid_air #This is the joined version of the COVID-19 and EPA data set
 
 ```
 
+```{r}
+df_pm25 <- read_csv("./data/pm25.csv")
+df_pm25
+```
+  group_by(fips) %>% 
+  summarize(mean_pm25 = mean(pm25)) %>% 
+
+  mutate(fips = filter(
+                        nchar(fips) == 4
+                )
+           paste("0", fips, sep = "")
+  ) %>%
+  
+  arrange((fips))
+
 
 ```{r}
 df_covid_air %>%
   filter(State == "Alabama")  %>%
-  summarise(a = Median.AQI, y = cases, County = County) %>%
+  summarise(Air_Quality_Index = Median.AQI, Cases = cases, County = County) %>%
   ggplot() +
-  geom_point(aes(a, y, color = County))
+  geom_point(aes(Air_Quality_Index, Cases, color = County))
   
  # ggplot() +
-#  geom_line(aes("Median.AQI", "confirmed_cases", color = County))
+ # geom_line(aes("Median.AQI", "confirmed_cases", color = County))
 
 
 ```
 
 
-  
+
+```{r}
+df_covid_air %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Cases = cases,
+    County = County,
+    State = State) %>%
   ggplot() +
-  geom_point(aes(x = cases, y = "Median.AQI")) +
-  facet_grid(~County)
+  geom_point(aes(Air_Quality_Index, Cases, color = State)) +
+  scale_y_log10()
+df_covid_air %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Deaths = deaths,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Deaths, color = State)) +
+  scale_y_log10()
+```
+ 
+```{r}
+df_covid_air %>%
+  filter(State == "California") %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Cases = cases,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Cases, color = County)) +
+  scale_y_log10()
+df_covid_air %>%
+  filter(State == "New York") %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Cases = cases,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Cases, color = County)) +
+  scale_y_log10()
+df_covid_air %>%
+  filter(State == "Florida") %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Deaths = deaths,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Deaths, color = County)) +
+  scale_y_log10()
+```
 
 
 
