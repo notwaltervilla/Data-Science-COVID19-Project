@@ -15,7 +15,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 library(tidyverse)
 library(tidyr)
 
-df_airquality2020<- read.csv("/home/notwaltervilla/data-science-projects/Data-Science-COVID19-Project/data/annual_aqi_by_county_2020.csv")
+df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
 df_airquality2020
 ```
 ## NOTE ==  AQI (air quality index) - Bigger is worst 
@@ -37,7 +37,7 @@ df_covid
 ```{r wrangling data}
 names(df_covid)[2] <- "County"
 names(df_covid)[3] <- "State"
-newDataSet <- inner_join(df_covid, df_airquality2020, by = NULL)
+newDataSet <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
 newDataSet #This is the joined version of the COVID-19 and EPA data set
 
 ```
