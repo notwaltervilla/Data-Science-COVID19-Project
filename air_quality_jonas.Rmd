@@ -59,6 +59,39 @@ df_pm25
   arrange((fips))
 
 
+
+
+```{r zdr-theme}
+## NOTE: No need to edit; feel free to re-use this code!
+theme_common <- function() {
+  theme_minimal() %+replace%
+  theme(
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(margin = margin(4, 4, 4, 4), size = 16),
+    axis.title.y = element_text(margin = margin(4, 4, 4, 4), size = 16, angle = 90),
+
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 12),
+
+    strip.text.x = element_text(size = 12),
+    strip.text.y = element_text(size = 12),
+
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_line(color = "grey90"),
+
+    aspect.ratio = 4 / 4,
+
+    plot.margin = unit(c(t = +0, b = +0, r = +0, l = +0), "cm"),
+    plot.title = element_text(size = 18),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 16),
+    plot.caption = element_text(size = 12)
+  )
+}
+```
+
+
 ```{r}
 df_covid_air %>%
   filter(State == "Alabama")  %>%
@@ -92,8 +125,14 @@ df_covid_air %>%
     State = State) %>%
   ggplot() +
   geom_point(aes(Air_Quality_Index, Deaths, color = State)) +
+  geom_smooth(aes(Air_Quality_Index, Deaths), method = "lm") +
   scale_y_log10()
 ```
+
+
+
+
+
  
 ```{r}
 df_covid_air %>%
@@ -106,16 +145,7 @@ df_covid_air %>%
   ggplot() +
   geom_point(aes(Air_Quality_Index, Cases, color = County)) +
   scale_y_log10()
-df_covid_air %>%
-  filter(State == "New York") %>%
-  summarise(
-    Air_Quality_Index = Median.AQI,
-    Cases = cases,
-    County = County,
-    State = State) %>%
-  ggplot() +
-  geom_point(aes(Air_Quality_Index, Cases, color = County)) +
-  scale_y_log10()
+
 df_covid_air %>%
   filter(State == "Florida") %>%
   summarise(
@@ -127,6 +157,57 @@ df_covid_air %>%
   geom_point(aes(Air_Quality_Index, Deaths, color = County)) +
   scale_y_log10()
 ```
+
+```{r}
+theme_NY <- function() {
+  theme_minimal() %+replace%
+  theme(
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(margin = margin(4, 4, 4, 4), size = 16),
+    axis.title.y = element_text(margin = margin(4, 4, 4, 4), size = 16, angle = 90),
+
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 12),
+
+    strip.text.x = element_text(size = 12),
+    strip.text.y = element_text(size = 12),
+
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_line(color = "grey90"),
+
+    aspect.ratio = 1.2 / 2,
+
+    plot.margin = unit(c(t = +0.2, b = +0, r = +0.2, l = +0), "cm"),
+    plot.title = element_text(size = 18),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 16),
+    plot.caption = element_text(size = 12),
+    
+  )
+}
+df_covid_air %>%
+  filter(State == "New York") %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Cases = cases,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Cases)) +
+  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
+  scale_y_log10() +
+  labs(
+    x = "2020 Median Air Quality Index (AQI)",
+    y = "Cases"
+  ) +
+  theme_NY() +
+  ggtitle("Lack of correlation in NY AQI and Cases")
+
+```
+
+
+
 
 
 
