@@ -46,7 +46,49 @@ newDataSet #This is the joined version of the COVID-19 and EPA data set
 newDataSet %>% 
   filter(State == "New York") %>% 
   ggplot() + 
-  geom_point(mapping = aes(x = confirmed_cases, y = Median.AQI, color = County))
+  geom_point(mapping = aes(x = Median.AQI, y = confirmed_cases , color = County)) + 
+  scale_y_log10() + 
+  labs(
+    title = "Confirmed Cases vs. Median AQI for New York",
+    x = "Median AQI",
+    y = "Confirmed Cases"
+  ) 
 
+```
+### The following is Jonas code
+
+```{r - Cases vs Median AQI across US}
+df_covid_air %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    deaths = deaths,
+    County = County,
+    State = State) %>%
+  ggplot(mapping = aes(Air_Quality_Index,Cases)) +
+  geom_point() +
+  geom_smooth(method = lm) + 
+  scale_y_log10() + 
+  labs(
+    title = "Cases vs. Median AQI across the US",
+    x = "Median AQI",
+    y = "Cases"
+  ) 
+```
+```{r - Deaths vs Median AQI across the US}
+df_covid_air %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Deaths = deaths,
+    County = County,
+    State = State) %>%
+  ggplot(mapping = aes(Air_Quality_Index, Deaths)) +
+  geom_point() +
+  geom_smooth(method = lm) + 
+  scale_y_log10() + 
+  labs(
+    title = "Deaths vs. Median AQI across the US",
+    x = "Median AQI",
+    y = "Deaths"
+  ) 
 ```
 
