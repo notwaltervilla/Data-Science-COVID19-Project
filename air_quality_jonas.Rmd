@@ -17,6 +17,10 @@ library(tidyverse)
 
 #Loading EPA Air Quality Data
 df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2019<- read.csv("./data/annual_aqi_by_county_2019.csv")
+df_airquality2018<- read.csv("./data/annual_aqi_by_county_2018.csv")
+df_airquality2017<- read.csv("./data/annual_aqi_by_county_2017.csv")
+df_airquality2016<- read.csv("./data/annual_aqi_by_county_2016.csv")
 df_airquality2020
 
 #Load NYTimes Data - using code from c06
@@ -40,7 +44,6 @@ names(df_covid)[2] <- "County"
 names(df_covid)[3] <- "State"
 df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
 df_covid_air #This is the joined version of the COVID-19 and EPA data set
-
 ```
 
 ```{r}
@@ -205,6 +208,9 @@ df_covid_air %>%
   ggtitle("Lack of correlation in NY AQI and Cases")
 
 ```
+
+
+
 
 
 
