@@ -5,9 +5,14 @@ date: 2020-06-05
 output: github_document
 ---
   
-*Purpose*: To answer the question: Is there a correlation between covid outcomes and air quality?
+*Purpose*: Is there a correlation between covid-19 outcomes and air quality?
 
 *Background*:
+
+Breathing in pollutants from the air is a large risk factor for lung related death. Studies have shown that long term exposure to polluted air can lead to irritation and damage throughout your respiratory pathway. Additionally, this damage is exaceerbated in people with existing respiratory illnesses. Covid-19 is a novel coronavirus that emerged in late 2019 and has spread throughout the US and the world affecting millions. The virus and its effects are still being studied, but it has been shown to attack the lungs and cause problems with breathing. Due to the virus' impact on the respiratory system,  a study was conducted by Harvard researchers to analyze the connection between air pollution and Covid-19 mortality in the US. 
+
+https://www.hsph.harvard.edu/news/hsph-in-the-news/air-pollution-linked-with-higher-covid-19-death-rates/
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4776742/
 
 *Notes*:
 - I had trouble running the Case study in my browser. Note that the `who` dataset is loaded by the `tidyverse`. You can run the Case study locally if you need to!
