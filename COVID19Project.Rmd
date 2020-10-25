@@ -18,6 +18,8 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4776742/
 
 In addition to this Harvard paper, Stanford researcher Mary Prunicki speaks about the potential damage that toxic air can have on peoples' immune systems. Her findings include making statements on linking air pollution to disease (diabetes, heart disease, stroke, cancer, etc), all of which increase the risk of death in COVID19. She also comments that air pollution causes a deregulated immune system, making it more likely to cause damage and lay a foundation for potential chronic diseases.   
 
+https://scopeblog.stanford.edu/2020/07/17/why-air-pollution-is-linked-to-severe-cases-of-covid-19/#:~:text=Studies%20are%20coming%20out%20that,areas%20of%20high%20pollution%20exposure.&text=This%20study%20and%20others%20have,the%20COVID%2D19%20death%20rate.
+
 *Notes*:
 - I had trouble running the Case study in my browser. Note that the `who` dataset is loaded by the `tidyverse`. You can run the Case study locally if you need to!
 - The case study uses `gather` instead of `pivot_longer`; feel free to use `pivot_longer` in place.
