@@ -9,7 +9,9 @@ output: github_document
 
 *Background*:
 
-Breathing in pollutants from the air is a large risk factor for lung related death. Studies have shown that long term exposure to polluted air can lead to irritation and damage throughout your respiratory pathway. Additionally, this damage is exaceerbated in people with existing respiratory illnesses. Covid-19 is a novel coronavirus that emerged in late 2019 and has spread throughout the US and the world affecting millions. The virus and its effects are still being studied, but it has been shown to attack the lungs and cause problems with breathing. Due to the virus' impact on the respiratory system,  a study was conducted by Harvard researchers to analyze the connection between air pollution and Covid-19 mortality in the US. 
+Air pollution is a mixture of solid and gas particles. Because air pollution may originate from different sources depending on location,  
+
+Breathing in pollutants from the air is a large risk factor for lung related death. Studies have shown that long term exposure to polluted air can lead to irritation and damage throughout your respiratory pathway. Additionally, this damage is exacerbated in people with existing respiratory illnesses. Covid-19 is a novel coronavirus that emerged in late 2019 and has spread throughout the US and the world affecting millions. The virus and its effects are still being studied, but it has been shown to attack the lungs and cause problems with breathing. Due to the virus' impact on the respiratory system,  a study was conducted by Harvard researchers to analyze the connection between air pollution and Covid-19 mortality in the US. 
 
 https://www.hsph.harvard.edu/news/hsph-in-the-news/air-pollution-linked-with-higher-covid-19-death-rates/
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4776742/
