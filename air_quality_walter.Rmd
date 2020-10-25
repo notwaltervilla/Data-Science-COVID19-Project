@@ -102,10 +102,11 @@ df_covid_air %>%
 ```{r}
 
 newDataSet %>% 
-  arrange(desc(Median.AQI)) %>% 
-  #group_by("State") %>% 
-  ggplot() + 
-  geom_col(mapping = aes(x = Median.AQI, y = State))
+  group_by("State") %>% 
+  arrange(desc(Median.AQI)) %>%
+  ggplot(aes(x = State, y = Median.AQI)) + 
+  geom_bar(stat = "identity") + 
+  coord_flip()
 
 
 
