@@ -94,11 +94,13 @@ df_avg_aqi <- df_aqi_19_09 %>%
   group_by(County, State) %>%
   summarise_at(vars("Median.AQI"),
                 list(Avg_aqi = mean))
-df_covid_air_mean <- inner_join(df_covid, df_avg_aqi, by = c("County", "State"))
-df_covid_air_mean #This is the joined version of COVID-19 and 10 year mean EPA data
 
 names(df_covid)[2] <- "County"
 names(df_covid)[3] <- "State"
+df_covid_air_mean <- inner_join(df_covid, df_avg_aqi, by = c("County", "State"))
+df_covid_air_mean #This is the joined version of COVID-19 and 10 year mean EPA data
+
+
 df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
 df_covid_air #This is the joined version of the COVID-19 and EPA data set
 ```
@@ -177,6 +179,11 @@ df_covid_air_mean %>%
       y = "Deaths"
     ) +
   ggtitle("Correlation between deaths and 10 year mean aqi by county")
+
+```
+
+
+```{r}
 df_covid_air_mean %>%
   summarise(
     Air_Quality_Index = Avg_aqi,
@@ -195,8 +202,6 @@ df_covid_air_mean %>%
     ) +
   ggtitle("Correlation between cases and 10 year mean aqi by county")
 ```
-
-
 
 
 
