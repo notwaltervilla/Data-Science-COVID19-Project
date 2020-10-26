@@ -1,6 +1,6 @@
 ---
-title: "air_quality_jonas"
-author: "Jonas"
+title: "air_quality_shawn"
+author: "Shawn"
 date: "10/20/2020"
 output: html_document
 ---
@@ -8,18 +8,22 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-
 ```
 
 
 
-```{r load NYT data}
+```{r Download data}
+# # Load PM2.5 Data - run this once
+# url_pm25 <- "https://raw.githubusercontent.com/wxwx1993/PM_COVID/master/Data/county_pm25.csv"
+# filename_pm25 <- "./data/pm25.csv"
+# 
+# # Download the data locally
+# curl::curl_download(
+#         url_pm25,
+#         destfile = filename_pm25
+#       )
 
-#Loading EPA Air Quality Data
-df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
-df_airquality2020
-
-#Load NYTimes Data - using code from c06
+# Load NYTimes Data - using code from c06
 url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
 filename_nyt <- "./data/nyt_counties.csv"
 
@@ -29,55 +33,193 @@ curl::curl_download(
         destfile = filename_nyt
       )
 
-## Loads the downloaded csv
+
+```
+
+```{r import data}
+# Import Cenus data
+df_pop <- 
+  read_csv(
+    "data/ACSDT5Y2018.B01003_data_with_overlays_2020-10-07T204051.csv", 
+    c("id", "Geographic Area Name", "Estimate!!Total", "Margin of Error!!Total"),
+  skip = 2
+  ) %>% 
+  mutate(fips = str_sub(id, -5, -1))
+df_pop
+
+# Import NYT-covid data
 df_covid <- read_csv(filename_nyt)
 df_covid
+
+# Import EPA Air Quality Data
+df_airquality2020 <- read_csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2020
+
+# Loads the downloaded csv
+df_pm25 <- read_csv(filename_pm25)
+df_pm25
+```
+
+```{r join}
+## TASK: Join df_covid and df_pop by fips.
+df_data <- 
+  df_covid %>% 
+  full_join(df_pop, by = "fips") %>% 
+  select(
+  date,
+  county,
+  state,
+  fips,
+  cases,
+  deaths,
+  population = `Estimate!!Total`
+  )
+df_data
+  
+```
+
+
+```{r find mean pm25 by fips, join with df_covid}
+
+df_pm <- 
+  group_by(df_pm25, fips) %>%
+# Find mean pm2.5 concentration for available timeframe
+  summarize(mean_pm25 = mean(pm25)) %>%
+  
+# Add "0" to zip codes that are missing it
+  mutate(fips = ifelse(nchar(fips) == 4, paste("0", fips, sep = ""), fips)) %>% 
+  mutate(fips = as.character(fips))
+  
+# Join with NYT data
+  # full_join(df_data, by = "fips")
+
+
+df_pm
+
+```
+
+
+```{r normalize per 100k}
+df_norm <- 
+  df_pm %>% 
+# Add normalized deaths column
+  mutate(deaths_per_100k = deaths * 100000 / population)
+df_norm
+```
+
+
+
+```{r zdr-theme}
+## NOTE: No need to edit; feel free to re-use this code!
+theme_common <- function() {
+  theme_minimal() %+replace%
+  theme(
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title.x = element_text(margin = margin(4, 4, 4, 4), size = 16),
+    axis.title.y = element_text(margin = margin(4, 4, 4, 4), size = 16, angle = 90),
+
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 12),
+
+    strip.text.x = element_text(size = 12),
+    strip.text.y = element_text(size = 12),
+
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_line(color = "grey90"),
+
+    aspect.ratio = 4 / 4,
+
+    plot.margin = unit(c(t = +0, b = +0, r = +0, l = +0), "cm"),
+    plot.title = element_text(size = 18),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 16),
+    plot.caption = element_text(size = 12)
+  )
+}
+```
+
+```{r graph of PM25 with normalized death rate}
+df_norm %>% 
+  # filter(County != "New York City") %>% %>% 
+  ggplot(aes(mean_pm25, deaths_per_100k)) + 
+  geom_point(size = .1) + 
+  scale_y_log10() + 
+  geom_smooth(method = glm)+
+  theme_common()
+```
+
+
+```{r fit data to model}
+df_norm %>% 
+  arrange(State)
+  # select(mean_pm25, deaths_per_100k, )
+```
+```{r load lots of EPA data}
+df_2019 <- 
+  read_csv(
+    "./data/daily_88101/daily_88101_2019.csv",
+    col_names = c("date", "pm25", "state", "county"),
+    col_types = "___________?____?_______??___", 
+    skip = 1
+  ) %>% 
+  group_by(state, county) %>% 
+  summarize(pm25_2019 = mean(pm25))
+
+  
+df_2019
+```
+```{r}
+csv_abbr <- function(filename) {
+  csv <- 
+    read_csv(
+      file,
+      col_names = c("date", "pm25", "state", "county"),
+      col_types = "___________?____?_______??___", 
+      skip = 1
+    ) %>% 
+  group_by(state, county) %>% 
+  summarize(pm25_year = mean(pm25))
+  
+}
+```
+
+
+```{r}
+
+files <- c("./data/daily_88101/daily_88101_2019.csv", "./data/daily_88101/daily_88101_2019.csv")
+df_2019 <- 
+  csv_abbr(files)
+df_2019
+```
+
+
+```{r}
+
+files <- 
+  list.files(path = "./data/daily_88101", pattern = "*.csv", full.names = T)
+tbl <- sapply(files, csv_abbr, simplify = FALSE) %>% 
+  bind_rows(.id = "id")
+tbl
 ```
 
 ```{r}
-#Load PM2.5 Data - using code from c06
-url_pm25 <- "https://raw.githubusercontent.com/wxwx1993/PM_COVID/master/Data/county_pm25.csv"
-filename_pm25 <- "./data/pm25.csv"
-
-## Download the data locally
-curl::curl_download(
-        url_pm25,
-        destfile = filename_pm25
-      )
-
-## Loads the downloaded csv
-df_pm25 <- read_csv(filename_pm25)
-df_pm25 %>% 
-  arrange(fips)
-```
-```{r find mean pm25 by fips}
-df_pm25 %>% 
-  group_by(fips) %>% 
-  summarize(mean_pm25 = mean(pm25)) %>% 
-
-  mutate(fips = filter(
-                        nchar(fips) == 4
-                )
-           paste("0", fips, sep = "")
-  ) %>%
-  
-  arrange((fips))
-  
-  # mutate(fips = as.character(fips)) %>%
-  # arrange(fips)
+tbl
 ```
 
 
-
-```{r wrangling data}
+```{r join df_covid with EPA data}
 names(df_covid)[2] <- "County"
 names(df_covid)[3] <- "State"
-df_covid_air <- 
-  inner_join(df_covid, df_airquality2020, by = c("County", "State"))
+df_covid_air <-
+  df_covid %>% 
+  inner_join(df_airquality2020, by = c("County", "State"))
 
-df_covid_air #This is the joined version of the COVID-19 and EPA data set
+df_airquality2020
 
 ```
+
+
 
 
 ```{r}
@@ -100,17 +242,16 @@ df_covid_air %>%
   ggplot(aes(Median.AQI, deaths)) +
   geom_point()
 ```
+
 ```{r PM2.5}
 df_covid_air %>% 
   group_by(Days.PM2.5) %>% 
   summarize(deaths = mean(deaths)) %>% 
   ggplot(aes(Days.PM2.5, deaths)) +
-  geom_point()
+  geom_point() + 
+  geom_smooth(method = loess)
 ```
   
-  ggplot() +
-  geom_point(aes(x = cases, y = "Median.AQI")) +
-  facet_grid(~County)
 
 
 

@@ -46,64 +46,6 @@ library(tidyr)
 ```
 We load the our datasets here: 
 
-```{r load data}
-#Loading EPA Air Quality Data
-df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
-df_airquality2019<- read.csv("./data/annual_aqi_by_county_2019.csv")
-df_airquality2018<- read.csv("./data/annual_aqi_by_county_2018.csv")
-df_airquality2017<- read.csv("./data/annual_aqi_by_county_2017.csv")
-df_airquality2016<- read.csv("./data/annual_aqi_by_county_2016.csv")
-df_airquality2015<- read.csv("./data/annual_aqi_by_county_2015.csv")
-df_airquality2014<- read.csv("./data/annual_aqi_by_county_2014.csv")
-df_airquality2013<- read.csv("./data/annual_aqi_by_county_2013.csv")
-df_airquality2012<- read.csv("./data/annual_aqi_by_county_2012.csv")
-df_airquality2011<- read.csv("./data/annual_aqi_by_county_2011.csv")
-df_airquality2010<- read.csv("./data/annual_aqi_by_county_2010.csv")
-df_airquality2009<- read.csv("./data/annual_aqi_by_county_2009.csv")
-
-#Combine data from 2019 to 2009 into df_aqi_19_09
-df_aqi_19_18 <- rbind(df_airquality2019, df_airquality2018)
-df_aqi_19_17 <- rbind(df_aqi_19_18, df_airquality2017)
-df_aqi_19_16 <- rbind(df_aqi_19_17, df_airquality2016)
-df_aqi_19_15 <- rbind(df_aqi_19_16, df_airquality2015)
-df_aqi_19_14 <- rbind(df_aqi_19_15, df_airquality2014)
-df_aqi_19_13 <- rbind(df_aqi_19_14, df_airquality2013)
-df_aqi_19_12 <- rbind(df_aqi_19_13, df_airquality2012)
-df_aqi_19_11 <- rbind(df_aqi_19_12, df_airquality2011)
-df_aqi_19_10 <- rbind(df_aqi_19_11, df_airquality2010)
-df_aqi_19_09 <- rbind(df_aqi_19_10, df_airquality2009)
-
-#Load NYTimes Data - using code from c06
-url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
-filename_nyt <- "./data/nyt_counties.csv"
-
-## Download the data locally
-curl::curl_download(
-        url_counties,
-        destfile = filename_nyt
-      )
-
-## Loads the downloaded csv
-df_covid <- read_csv(filename_nyt)
-df_covid
-```
-
-```{r wrangling data}
-#Get the avg aqi for years 2009-2019
-df_avg_aqi <- df_aqi_19_09 %>%
-  group_by(County, State) %>%
-  summarise_at(vars("Median.AQI"),
-                list(Avg_aqi = mean))
-df_covid_air_mean <- inner_join(df_covid, df_avg_aqi, by = c("County", "State"))
-df_covid_air_mean #This is the joined version of COVID-19 and 10 year mean EPA data
-
-names(df_covid)[2] <- "County"
-names(df_covid)[3] <- "State"
-df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
-df_covid_air #This is the joined version of the COVID-19 and EPA data set
-```
-
-
 ```{r theme}
 #Define our plotting theme
 theme_common <- function() {
@@ -135,41 +77,120 @@ theme_common <- function() {
 ```
 
 
+```{r load data}
 
+# Load PM2.5 Data - run this once
+# data originally from The Atmospheric Composition Analysis Group (ACAG) at Dalhouse University (http://fizz.phys.dal.ca/~atmos/martin/)
+url_pm25 <- "https://raw.githubusercontent.com/wxwx1993/PM_COVID/master/Data/county_pm25.csv"
+filename_pm25 <- "./data/pm25.csv"
 
-```{r}
-# Plot the 
-df_covid_air %>%
-  filter(State == "New York") %>%
-  summarise(
-    Air_Quality_Index = Median.AQI,
-    Cases = cases,
-    County = County,
-    State = State) %>%
-  ggplot() +
-  geom_point(aes(Air_Quality_Index, Cases)) +
-  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
-  scale_y_log10() +
-  labs(
-    x = "2020 Median Air Quality Index (AQI)",
-    y = "Cases"
-  ) +
-  theme_common() +
-  ggtitle("Lack of correlation in NY AQI and Cases")
+# Download the data locally
+curl::curl_download(
+        url_pm25,
+        destfile = filename_pm25
+       )
+
+#Load NYTimes Data - using code from c06
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
+filename_nyt <- "./data/nyt_counties.csv"
+
+## Download the data locally
+curl::curl_download(
+        url_counties,
+        destfile = filename_nyt
+      )
 ```
 
 
+```{r import data}
+#Loading EPA Air Quality Data
+df_airquality2020 <- read.csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2019 <- read.csv("./data/annual_aqi_by_county_2019.csv")
+df_airquality2018 <- read.csv("./data/annual_aqi_by_county_2018.csv")
+df_airquality2017 <- read.csv("./data/annual_aqi_by_county_2017.csv")
+df_airquality2016 <- read.csv("./data/annual_aqi_by_county_2016.csv")
+df_airquality2015 <- read.csv("./data/annual_aqi_by_county_2015.csv")
+df_airquality2014 <- read.csv("./data/annual_aqi_by_county_2014.csv")
+df_airquality2013 <- read.csv("./data/annual_aqi_by_county_2013.csv")
+df_airquality2012 <- read.csv("./data/annual_aqi_by_county_2012.csv")
+df_airquality2011 <- read.csv("./data/annual_aqi_by_county_2011.csv")
+df_airquality2010 <- read.csv("./data/annual_aqi_by_county_2010.csv")
+df_airquality2009 <- read.csv("./data/annual_aqi_by_county_2009.csv")
 
-```{r}
-df_covid_air_mean %>%
-  summarise(
-    Air_Quality_Index = Avg_aqi,
-    Deaths = deaths,
-    County = County,
-    State = State) %>%
+#Combine data from 2019 to 2009 into df_aqi_19_09
+df_aqi_19_18 <- rbind(df_airquality2019, df_airquality2018)
+df_aqi_19_17 <- rbind(df_aqi_19_18, df_airquality2017)
+df_aqi_19_16 <- rbind(df_aqi_19_17, df_airquality2016)
+df_aqi_19_15 <- rbind(df_aqi_19_16, df_airquality2015)
+df_aqi_19_14 <- rbind(df_aqi_19_15, df_airquality2014)
+df_aqi_19_13 <- rbind(df_aqi_19_14, df_airquality2013)
+df_aqi_19_12 <- rbind(df_aqi_19_13, df_airquality2012)
+df_aqi_19_11 <- rbind(df_aqi_19_12, df_airquality2011)
+df_aqi_19_10 <- rbind(df_aqi_19_11, df_airquality2010)
+df_aqi_19_09 <- rbind(df_aqi_19_10, df_airquality2009)
+
+# Import Cenus data
+df_pop <- 
+  read_csv(
+    "data/ACSDT5Y2018.B01003_data_with_overlays_2020-10-07T204051.csv", 
+    c("id", "Geographic Area Name", "Estimate!!Total", "Margin of Error!!Total"),
+  skip = 2
+  ) %>% 
+  mutate(fips = str_sub(id, -5, -1))
+df_pop
+
+# Import NYT-covid data
+df_covid <- read_csv(filename_nyt)
+df_covid
+
+# Import EPA Air Quality Data
+df_airquality2020 <- read_csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2020
+
+# Loads the downloaded csv
+df_pm25 <- read_csv(filename_pm25)
+df_pm25
+```
+
+
+```{r wrangle EPA data}
+names(df_covid)[2] <- "County"
+names(df_covid)[3] <- "State"
+
+# Get the average aqi for years 2009-2019
+df_avg_aqi <- df_aqi_19_09 %>%
+  group_by(County, State) %>%
+  summarise_at(vars("Median.AQI"),
+                list(Avg_aqi = mean))
+
+# Join with COVID data, add normalized data
+df_covid_air_mean <- 
+  inner_join(df_covid, df_avg_aqi, by = c("County", "State"))
+
+df_covid_air_mean_pop <- 
+  df_covid_air_mean %>% 
+  full_join(df_pop, by = "fips") %>%  
+  select(
+  date,
+  County,
+  State,
+  fips,
+  cases,
+  deaths,
+  population = `Estimate!!Total`,
+  Avg_aqi
+  ) %>%
+  mutate(deaths_per_100k = deaths * 100000 / population) %>%
+  mutate(cases_per_100k = cases * 100000 / population)
+
+
+df_covid_air_mean_pop #This is the joined version of COVID-19 and 10 year mean EPA data
+```
+```{r plot EPA data}
+df_covid_air_mean_pop %>%
   ggplot() +
-  geom_point(aes(Air_Quality_Index, Deaths)) +
-  geom_smooth(aes(Air_Quality_Index, Deaths), method = "lm") +
+  geom_point(aes(Avg_aqi, deaths_per_100k), size = 1) +
+  geom_smooth(aes(Avg_aqi, deaths_per_100k), method = "lm") +
   theme_common() +
   scale_y_log10()+
   labs(
@@ -177,16 +198,12 @@ df_covid_air_mean %>%
       y = "Deaths"
     ) +
   ggtitle("Correlation between deaths and 10 year mean aqi by county")
-df_covid_air_mean %>%
-  summarise(
-    Air_Quality_Index = Avg_aqi,
-    Cases = cases,
-    Deaths = deaths,
-    County = County,
-    State = State) %>%
+
+
+df_covid_air_mean_pop %>%
   ggplot() +
-  geom_point(aes(Air_Quality_Index, Cases)) +
-  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
+  geom_point(aes(Avg_aqi, cases_per_100k), size = .2) +
+  geom_smooth(aes(Avg_aqi, cases_per_100k), method = "lm") +
   theme_common() +
   scale_y_log10()+
   labs(
@@ -195,6 +212,71 @@ df_covid_air_mean %>%
     ) +
   ggtitle("Correlation between cases and 10 year mean aqi by county")
 ```
+
+
+
+```{r wrangle ACAG data}
+df_data <- 
+  df_covid %>% 
+  full_join(df_pop, by = "fips") %>% 
+  select(
+  date,
+  County,
+  State,
+  fips,
+  cases,
+  deaths,
+  population = `Estimate!!Total`
+  )
+df_data
+
+df_pm <- 
+  group_by(df_pm25, fips) %>%
+# Find mean pm2.5 concentration for available timeframe
+  summarize(mean_pm25 = mean(pm25)) %>%
+  
+# Add "0" to zip codes that are missing it
+  mutate(fips = ifelse(nchar(fips) == 4, paste("0", fips, sep = ""), fips)) %>% 
+  mutate(fips = as.character(fips)) %>% 
+  
+# Join with NYT data
+  full_join(df_data, by = "fips")
+  
+
+df_pm
+
+df_pm_norm <-
+  df_pm %>% 
+  mutate(deaths_per_100k = deaths * 100000 / population) %>%
+  mutate(cases_per_100k = cases * 100000 / population)
+
+df_pm_norm
+
+```
+
+```{r graph of PM25 with normalized death rate}
+df_pm_norm %>% 
+  ggplot(aes(mean_pm25, deaths_per_100k)) + 
+  geom_point(size = .1) + 
+  scale_y_log10() + 
+  geom_smooth(method = glm)+
+  theme_common()
+
+df_pm_norm %>% 
+  ggplot(aes(mean_pm25, cases_per_100k)) + 
+  geom_point(size = .1) + 
+  scale_y_log10() + 
+  geom_smooth(method = glm)+
+  theme_common()
+```
+
+
+
+
+
+
+
+
 
 
 
