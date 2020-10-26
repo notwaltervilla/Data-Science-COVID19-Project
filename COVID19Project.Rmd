@@ -14,6 +14,9 @@ Air pollution is a mixture of solid and gas particles. Because air pollution may
 Breathing in pollutants from the air is a large risk factor for lung related death. Studies have shown that long term exposure to polluted air can lead to irritation and damage throughout your respiratory pathway. Additionally, this damage is exacerbated in people with existing respiratory illnesses. Covid-19 is a novel coronavirus that emerged in late 2019 and has spread throughout the US and the world affecting millions. The virus and its effects are still being studied, but it has been shown to attack the lungs and cause problems with breathing. Due to the virus' impact on the respiratory system,  a study was conducted by Harvard researchers to analyze the connection between air pollution and Covid-19 mortality in the US. 
 
 https://www.hsph.harvard.edu/news/hsph-in-the-news/air-pollution-linked-with-higher-covid-19-death-rates/
+
+They found that higher Air Pollution, specifically the pollution category of PM2.5 (particulate diameter of ~2.5 micrometers), is linked with higher Covid-19 death rates. The study suggested that counties that have higher pollution will show "higher numbers of hospitalizations, higher numbers of deaths". We set out to explore this finding and to test if it holds using our data sources. 
+
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4776742/
 
 In addition to this Harvard paper, Stanford researcher Mary Prunicki speaks about the potential damage that toxic air can have on peoples' immune systems. Her findings include making statements on linking air pollution to disease (diabetes, heart disease, stroke, cancer, etc), all of which increase the risk of death in COVID19. She also comments that air pollution causes a deregulated immune system, making it more likely to cause damage and lay a foundation for potential chronic diseases.   
@@ -23,14 +26,32 @@ Notes on PM 2.5
 https://scopeblog.stanford.edu/2020/07/17/why-air-pollution-is-linked-to-severe-cases-of-covid-19/#:~:text=Studies%20are%20coming%20out%20that,areas%20of%20high%20pollution%20exposure.&text=This%20study%20and%20others%20have,the%20COVID%2D19%20death%20rate.
 
 *Data*:
-Covid-19 data: Data collected from the new york times dataset
-link here
+Covid-19 data: New York Times data of cumulative counts of Covid-19 cases and deaths by county in the US. This data is compiled from state and local government as well as health departments. 
+https://github.com/nytimes/covid-19-data
 
-EPA data: description
-link here
+EPA data: Annual data taken from EPA's Air database that includes median air quality index values for each year by county. Air quality index (AQI) is a scale that takes into account many different forms of pollution to give an overall rating. Numbers on the low end (0-50) are considered "good" or healthy, whereas higher values (up to 500) are more dangerous for public health. 
+Data: https://aqs.epa.gov/aqsweb/airdata/download_files.html
+AQI: https://www.airnow.gov/aqi/aqi-basics/
 
-PM 2.5 data: description
-link here
+PM 2.5 data: County-level PM2.5 exposure averaged from 2000-2016 taken from the Harvard study exploring PM2.5's link with Covid-19. Data is originally from The Atmospheric Composition Analysis Group at Dalhouse University. PM2.5 is particular pollution size of diameter of ~2.5 micrometers, which are considered fine and easily inhalable. These particles have been shown to be a serious health risk in individuals who are exposed in large amounts or over long periods of time.  
+Study: https://github.com/wxwx1993/PM_COVID
+Data: http://fizz.phys.dal.ca/~atmos/martin/
+PM2.5: https://www.epa.gov/pm-pollution/particulate-matter-pm-basics
+
+*EDA Observations*:
+# We should comment on the data quality here
+We began by exploring the EPA dataset, to get an idea of what patterns exist in the data. To more accurately represent the long term health effects of air quality we calculated the 10 year average of annual air quality. Taking a look at this data we found that an overall average AQI of 36.51012, hawaii had the largest 10 year mean AQI of 136.4, which is likely due to volcanic activity, and a minimum AQI of 0 in a number of counties such as Brunswick, North Carolina. While exploring this data we noticed that a large number of counties were not included. This raised questions about the data, however it is most likely that these counties simply did not have any places where air quality is regularly measured. 
+
+Next we explored the Covid-19 data
+
+
+*Conclusion*:
+We found a correlation between 10 year averaged AQI and Covid-19 cases and deaths by county. These findings are in agreement with the paper that found a relation to Covid-19 outcomes and air pollution. However, we also noted that air pollution is linked to many other factors that may be confounding our results. For example, communities with higher levels of air pollution tend to be poorer communities. Additionally, accross different counties there are varying levels of testing availability, hospital availability, social distancing, and public health information which can all impact the cases and deaths resulting from Covid-19.
+
+https://www.niehs.nih.gov/research/programs/geh/geh_newsletter/2016/4/spotlight/poor_communities_exposed_to_elevated_air_pollution_levels.cfm
+
+*Questions and Future Exploration*:
+
 
 
 ```{r setup, include=FALSE}
@@ -38,56 +59,7 @@ link here
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-We load the libraries here: 
-
-```{r library}
-library(tidyverse)
-library(tidyr)
-```
-We load the our datasets here: 
-
-```{r load data}
-#Loading EPA Air Quality Data
-df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
-df_airquality2019<- read.csv("./data/annual_aqi_by_county_2019.csv")
-df_airquality2018<- read.csv("./data/annual_aqi_by_county_2018.csv")
-df_airquality2017<- read.csv("./data/annual_aqi_by_county_2017.csv")
-df_airquality2016<- read.csv("./data/annual_aqi_by_county_2016.csv")
-df_airquality2015<- read.csv("./data/annual_aqi_by_county_2015.csv")
-df_airquality2014<- read.csv("./data/annual_aqi_by_county_2014.csv")
-df_airquality2013<- read.csv("./data/annual_aqi_by_county_2013.csv")
-df_airquality2012<- read.csv("./data/annual_aqi_by_county_2012.csv")
-df_airquality2011<- read.csv("./data/annual_aqi_by_county_2011.csv")
-df_airquality2010<- read.csv("./data/annual_aqi_by_county_2010.csv")
-df_airquality2009<- read.csv("./data/annual_aqi_by_county_2009.csv")
-
-#Combine data from 2019 to 2009 into df_aqi_19_09
-df_aqi_19_18 <- rbind(df_airquality2019, df_airquality2018)
-df_aqi_19_17 <- rbind(df_aqi_19_18, df_airquality2017)
-df_aqi_19_16 <- rbind(df_aqi_19_17, df_airquality2016)
-df_aqi_19_15 <- rbind(df_aqi_19_16, df_airquality2015)
-df_aqi_19_14 <- rbind(df_aqi_19_15, df_airquality2014)
-df_aqi_19_13 <- rbind(df_aqi_19_14, df_airquality2013)
-df_aqi_19_12 <- rbind(df_aqi_19_13, df_airquality2012)
-df_aqi_19_11 <- rbind(df_aqi_19_12, df_airquality2011)
-df_aqi_19_10 <- rbind(df_aqi_19_11, df_airquality2010)
-df_aqi_19_09 <- rbind(df_aqi_19_10, df_airquality2009)
-
-#Load NYTimes Data - using code from c06
-url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
-filename_nyt <- "./data/nyt_counties.csv"
-
-## Download the data locally
-curl::curl_download(
-        url_counties,
-        destfile = filename_nyt
-      )
-
-## Loads the downloaded csv
-df_covid <- read_csv(filename_nyt)
-df_covid
-```
-
+<<<<<<< HEAD
 ```{r wrangling data}
 #Get the avg aqi for years 2009-2019
 df_avg_aqi <- df_aqi_19_09 %>%
@@ -103,8 +75,15 @@ df_covid_air_mean #This is the joined version of COVID-19 and 10 year mean EPA d
 
 df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
 df_covid_air #This is the joined version of the COVID-19 and EPA data set
-```
+=======
+We load our libraries here: 
 
+```{r library}
+library(tidyverse)
+library(tidyr)
+>>>>>>> d420c6965f4ab14e28b4f2b55c45733fe1859bb6
+```
+We load the our datasets here: 
 
 ```{r theme}
 #Define our plotting theme
@@ -137,41 +116,120 @@ theme_common <- function() {
 ```
 
 
+```{r load data}
+# Load PM2.5 Data - run this once
+# data originally from The Atmospheric Composition Analysis Group (ACAG) at Dalhouse University (http://fizz.phys.dal.ca/~atmos/martin/)
+url_pm25 <- "https://raw.githubusercontent.com/wxwx1993/PM_COVID/master/Data/county_pm25.csv"
+filename_pm25 <- "./data/pm25.csv"
 
+# Download the data locally
+curl::curl_download(
+        url_pm25,
+        destfile = filename_pm25
+       )
 
-```{r}
-# Plot the 
-df_covid_air %>%
-  filter(State == "New York") %>%
-  summarise(
-    Air_Quality_Index = Median.AQI,
-    Cases = cases,
-    County = County,
-    State = State) %>%
-  ggplot() +
-  geom_point(aes(Air_Quality_Index, Cases)) +
-  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
-  scale_y_log10() +
-  labs(
-    x = "2020 Median Air Quality Index (AQI)",
-    y = "Cases"
-  ) +
-  theme_common() +
-  ggtitle("Lack of correlation in NY AQI and Cases")
+#Load NYTimes Data - using code from c06
+url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
+filename_nyt <- "./data/nyt_counties.csv"
+
+## Download the data locally
+curl::curl_download(
+        url_counties,
+        destfile = filename_nyt
+      )
 ```
 
 
+```{r import data}
+#Loading EPA Air Quality Data
+df_airquality2020 <- read.csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2019 <- read.csv("./data/annual_aqi_by_county_2019.csv")
+df_airquality2018 <- read.csv("./data/annual_aqi_by_county_2018.csv")
+df_airquality2017 <- read.csv("./data/annual_aqi_by_county_2017.csv")
+df_airquality2016 <- read.csv("./data/annual_aqi_by_county_2016.csv")
+df_airquality2015 <- read.csv("./data/annual_aqi_by_county_2015.csv")
+df_airquality2014 <- read.csv("./data/annual_aqi_by_county_2014.csv")
+df_airquality2013 <- read.csv("./data/annual_aqi_by_county_2013.csv")
+df_airquality2012 <- read.csv("./data/annual_aqi_by_county_2012.csv")
+df_airquality2011 <- read.csv("./data/annual_aqi_by_county_2011.csv")
+df_airquality2010 <- read.csv("./data/annual_aqi_by_county_2010.csv")
+df_airquality2009 <- read.csv("./data/annual_aqi_by_county_2009.csv")
 
-```{r}
-df_covid_air_mean %>%
-  summarise(
-    Air_Quality_Index = Avg_aqi,
-    Deaths = deaths,
-    County = County,
-    State = State) %>%
+#Combine data from 2019 to 2009 into df_aqi_19_09
+df_aqi_19_18 <- rbind(df_airquality2019, df_airquality2018)
+df_aqi_19_17 <- rbind(df_aqi_19_18, df_airquality2017)
+df_aqi_19_16 <- rbind(df_aqi_19_17, df_airquality2016)
+df_aqi_19_15 <- rbind(df_aqi_19_16, df_airquality2015)
+df_aqi_19_14 <- rbind(df_aqi_19_15, df_airquality2014)
+df_aqi_19_13 <- rbind(df_aqi_19_14, df_airquality2013)
+df_aqi_19_12 <- rbind(df_aqi_19_13, df_airquality2012)
+df_aqi_19_11 <- rbind(df_aqi_19_12, df_airquality2011)
+df_aqi_19_10 <- rbind(df_aqi_19_11, df_airquality2010)
+df_aqi_19_09 <- rbind(df_aqi_19_10, df_airquality2009)
+
+# Import Census data
+df_pop <- 
+  read_csv(
+    "data/ACSDT5Y2018.B01003_data_with_overlays_2020-10-07T204051.csv", 
+    c("id", "Geographic Area Name", "Estimate!!Total", "Margin of Error!!Total"),
+  skip = 2
+  ) %>% 
+  mutate(fips = str_sub(id, -5, -1))
+df_pop
+
+
+# Import NYT-covid data
+df_covid <- read_csv(filename_nyt)
+df_covid
+
+# Import EPA Air Quality Data
+df_airquality2020 <- read_csv("./data/annual_aqi_by_county_2020.csv")
+df_airquality2020
+
+# Loads the downloaded csv
+df_pm25 <- read_csv(filename_pm25)
+df_pm25
+```
+
+
+```{r wrangle EPA data}
+names(df_covid)[2] <- "County"
+names(df_covid)[3] <- "State"
+
+# Get the average aqi for years 2009-2019
+df_avg_aqi <- df_aqi_19_09 %>%
+  group_by(County, State) %>%
+  summarise_at(vars("Median.AQI"),
+                list(Avg_aqi = mean))
+
+# Join with COVID data, add normalized data
+df_covid_air_mean <- 
+  inner_join(df_covid, df_avg_aqi, by = c("County", "State"))
+
+df_covid_air_mean_pop <- 
+  df_covid_air_mean %>% 
+  full_join(df_pop, by = "fips") %>%  
+  select(
+  date,
+  County,
+  State,
+  fips,
+  cases,
+  deaths,
+  population = `Estimate!!Total`,
+  Avg_aqi
+  ) %>%
+  mutate(deaths_per_100k = deaths * 100000 / population) %>%
+  mutate(cases_per_100k = cases * 100000 / population)
+
+
+df_covid_air_mean_pop #This is the joined version of COVID-19 and 10 year mean EPA data
+```
+```{r plot EPA data}
+df_covid_air_mean_pop %>%
   ggplot() +
-  geom_point(aes(Air_Quality_Index, Deaths)) +
-  geom_smooth(aes(Air_Quality_Index, Deaths), method = "lm") +
+  geom_point(aes(Avg_aqi, deaths_per_100k), size = 1) +
+  geom_smooth(aes(Avg_aqi, deaths_per_100k), method = "lm") +
   theme_common() +
   scale_y_log10()+
   labs(
@@ -180,6 +238,7 @@ df_covid_air_mean %>%
     ) +
   ggtitle("Correlation between deaths and 10 year mean aqi by county")
 
+<<<<<<< HEAD
 ```
 
 
@@ -191,9 +250,13 @@ df_covid_air_mean %>%
     Deaths = deaths,
     County = County,
     State = State) %>%
+=======
+
+df_covid_air_mean_pop %>%
+>>>>>>> d420c6965f4ab14e28b4f2b55c45733fe1859bb6
   ggplot() +
-  geom_point(aes(Air_Quality_Index, Cases)) +
-  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
+  geom_point(aes(Avg_aqi, cases_per_100k), size = .2) +
+  geom_smooth(aes(Avg_aqi, cases_per_100k), method = "lm") +
   theme_common() +
   scale_y_log10()+
   labs(
@@ -202,6 +265,71 @@ df_covid_air_mean %>%
     ) +
   ggtitle("Correlation between cases and 10 year mean aqi by county")
 ```
+
+
+
+```{r wrangle ACAG data}
+df_data <- 
+  df_covid %>% 
+  full_join(df_pop, by = "fips") %>% 
+  select(
+  date,
+  County,
+  State,
+  fips,
+  cases,
+  deaths,
+  population = `Estimate!!Total`
+  )
+df_data
+
+df_pm <- 
+  group_by(df_pm25, fips) %>%
+# Find mean pm2.5 concentration for available timeframe
+  summarize(mean_pm25 = mean(pm25)) %>%
+  
+# Add "0" to zip codes that are missing it
+  mutate(fips = ifelse(nchar(fips) == 4, paste("0", fips, sep = ""), fips)) %>% 
+  mutate(fips = as.character(fips)) %>% 
+  
+# Join with NYT data
+  full_join(df_data, by = "fips")
+  
+
+df_pm
+
+df_pm_norm <-
+  df_pm %>% 
+  mutate(deaths_per_100k = deaths * 100000 / population) %>%
+  mutate(cases_per_100k = cases * 100000 / population)
+
+df_pm_norm
+
+```
+
+```{r graph of PM25 with normalized death rate}
+df_pm_norm %>% 
+  ggplot(aes(mean_pm25, deaths_per_100k)) + 
+  geom_point(size = .1) + 
+  scale_y_log10() + 
+  geom_smooth(method = glm)+
+  theme_common()
+
+df_pm_norm %>% 
+  ggplot(aes(mean_pm25, cases_per_100k)) + 
+  geom_point(size = .1) + 
+  scale_y_log10() + 
+  geom_smooth(method = glm)+
+  theme_common()
+```
+
+
+
+
+
+
+
+
 
 
 
