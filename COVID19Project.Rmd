@@ -18,11 +18,20 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4776742/
 
 In addition to this Harvard paper, Stanford researcher Mary Prunicki speaks about the potential damage that toxic air can have on peoples' immune systems. Her findings include making statements on linking air pollution to disease (diabetes, heart disease, stroke, cancer, etc), all of which increase the risk of death in COVID19. She also comments that air pollution causes a deregulated immune system, making it more likely to cause damage and lay a foundation for potential chronic diseases.   
 
+Notes on PM 2.5
+
 https://scopeblog.stanford.edu/2020/07/17/why-air-pollution-is-linked-to-severe-cases-of-covid-19/#:~:text=Studies%20are%20coming%20out%20that,areas%20of%20high%20pollution%20exposure.&text=This%20study%20and%20others%20have,the%20COVID%2D19%20death%20rate.
 
-*Notes*:
-- I had trouble running the Case study in my browser. Note that the `who` dataset is loaded by the `tidyverse`. You can run the Case study locally if you need to!
-- The case study uses `gather` instead of `pivot_longer`; feel free to use `pivot_longer` in place.
+*Data*:
+Covid-19 data: Data collected from the new york times dataset
+link here
+
+EPA data: description
+link here
+
+PM 2.5 data: description
+link here
+
 
 ```{r setup, include=FALSE}
 # knitr options
@@ -38,10 +47,31 @@ library(tidyr)
 We load the our datasets here: 
 
 ```{r load data}
-
 #Loading EPA Air Quality Data
 df_airquality2020<- read.csv("./data/annual_aqi_by_county_2020.csv")
-df_airquality2020
+df_airquality2019<- read.csv("./data/annual_aqi_by_county_2019.csv")
+df_airquality2018<- read.csv("./data/annual_aqi_by_county_2018.csv")
+df_airquality2017<- read.csv("./data/annual_aqi_by_county_2017.csv")
+df_airquality2016<- read.csv("./data/annual_aqi_by_county_2016.csv")
+df_airquality2015<- read.csv("./data/annual_aqi_by_county_2015.csv")
+df_airquality2014<- read.csv("./data/annual_aqi_by_county_2014.csv")
+df_airquality2013<- read.csv("./data/annual_aqi_by_county_2013.csv")
+df_airquality2012<- read.csv("./data/annual_aqi_by_county_2012.csv")
+df_airquality2011<- read.csv("./data/annual_aqi_by_county_2011.csv")
+df_airquality2010<- read.csv("./data/annual_aqi_by_county_2010.csv")
+df_airquality2009<- read.csv("./data/annual_aqi_by_county_2009.csv")
+
+#Combine data from 2019 to 2009 into df_aqi_19_09
+df_aqi_19_18 <- rbind(df_airquality2019, df_airquality2018)
+df_aqi_19_17 <- rbind(df_aqi_19_18, df_airquality2017)
+df_aqi_19_16 <- rbind(df_aqi_19_17, df_airquality2016)
+df_aqi_19_15 <- rbind(df_aqi_19_16, df_airquality2015)
+df_aqi_19_14 <- rbind(df_aqi_19_15, df_airquality2014)
+df_aqi_19_13 <- rbind(df_aqi_19_14, df_airquality2013)
+df_aqi_19_12 <- rbind(df_aqi_19_13, df_airquality2012)
+df_aqi_19_11 <- rbind(df_aqi_19_12, df_airquality2011)
+df_aqi_19_10 <- rbind(df_aqi_19_11, df_airquality2010)
+df_aqi_19_09 <- rbind(df_aqi_19_10, df_airquality2009)
 
 #Load NYTimes Data - using code from c06
 url_counties <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/live/us-counties.csv"
@@ -59,13 +89,112 @@ df_covid
 ```
 
 ```{r wrangling data}
+#Get the avg aqi for years 2009-2019
+df_avg_aqi <- df_aqi_19_09 %>%
+  group_by(County, State) %>%
+  summarise_at(vars("Median.AQI"),
+                list(Avg_aqi = mean))
+df_covid_air_mean <- inner_join(df_covid, df_avg_aqi, by = c("County", "State"))
+df_covid_air_mean #This is the joined version of COVID-19 and 10 year mean EPA data
+
 names(df_covid)[2] <- "County"
 names(df_covid)[3] <- "State"
 df_covid_air <- inner_join(df_covid, df_airquality2020, by = c("County", "State"))
 df_covid_air #This is the joined version of the COVID-19 and EPA data set
-
 ```
 
+
+```{r theme}
+#Define our plotting theme
+theme_common <- function() {
+  theme_minimal() %+replace%
+  theme(
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    axis.title.x = element_text(margin = margin(4, 4, 4, 4), size = 10),
+    axis.title.y = element_text(margin = margin(4, 4, 4, 4), size = 10, angle = 90),
+
+    legend.title = element_text(size = 16),
+    legend.text = element_text(size = 12),
+
+    strip.text.x = element_text(size = 12),
+    strip.text.y = element_text(size = 12),
+
+    panel.grid.major = element_line(color = "grey90"),
+    panel.grid.minor = element_line(color = "grey90"),
+
+    aspect.ratio = 1.2 / 2,
+
+    plot.margin = unit(c(t = +0.2, b = +0, r = +0.2, l = +0), "cm"),
+    plot.title = element_text(size = 14),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(size = 16),
+    plot.caption = element_text(size = 12),
+  )
+}
+```
+
+
+
+
+```{r}
+# Plot the 
+df_covid_air %>%
+  filter(State == "New York") %>%
+  summarise(
+    Air_Quality_Index = Median.AQI,
+    Cases = cases,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Cases)) +
+  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
+  scale_y_log10() +
+  labs(
+    x = "2020 Median Air Quality Index (AQI)",
+    y = "Cases"
+  ) +
+  theme_common() +
+  ggtitle("Lack of correlation in NY AQI and Cases")
+```
+
+
+
+```{r}
+df_covid_air_mean %>%
+  summarise(
+    Air_Quality_Index = Avg_aqi,
+    Deaths = deaths,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Deaths)) +
+  geom_smooth(aes(Air_Quality_Index, Deaths), method = "lm") +
+  theme_common() +
+  scale_y_log10()+
+  labs(
+      x = "2009-2019 Mean Air Quality Index (AQI)",
+      y = "Deaths"
+    ) +
+  ggtitle("Correlation between deaths and 10 year mean aqi by county")
+df_covid_air_mean %>%
+  summarise(
+    Air_Quality_Index = Avg_aqi,
+    Cases = cases,
+    Deaths = deaths,
+    County = County,
+    State = State) %>%
+  ggplot() +
+  geom_point(aes(Air_Quality_Index, Cases)) +
+  geom_smooth(aes(Air_Quality_Index, Cases), method = "lm") +
+  theme_common() +
+  scale_y_log10()+
+  labs(
+      x = "2009-2019 Mean Air Quality Index (AQI)",
+      y = "Cases"
+    ) +
+  ggtitle("Correlation between cases and 10 year mean aqi by county")
+```
 
 
 
