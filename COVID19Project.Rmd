@@ -14,6 +14,9 @@ Air pollution is a mixture of solid and gas particles. Because air pollution may
 Breathing in pollutants from the air is a large risk factor for lung related death. Studies have shown that long term exposure to polluted air can lead to irritation and damage throughout your respiratory pathway. Additionally, this damage is exacerbated in people with existing respiratory illnesses. Covid-19 is a novel coronavirus that emerged in late 2019 and has spread throughout the US and the world affecting millions. The virus and its effects are still being studied, but it has been shown to attack the lungs and cause problems with breathing. Due to the virus' impact on the respiratory system,  a study was conducted by Harvard researchers to analyze the connection between air pollution and Covid-19 mortality in the US. 
 
 https://www.hsph.harvard.edu/news/hsph-in-the-news/air-pollution-linked-with-higher-covid-19-death-rates/
+
+They found that higher Air Pollution, specifically the pollution category of PM2.5 (particulate diameter of ~2.5 micrometers), is linked with higher Covid-19 death rates. The study suggested that counties that have higher pollution will show "higher numbers of hospitalizations, higher numbers of deaths". We set out to explore this finding and to test if it holds using our data sources. 
+
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4776742/
 
 In addition to this Harvard paper, Stanford researcher Mary Prunicki speaks about the potential damage that toxic air can have on peoples' immune systems. Her findings include making statements on linking air pollution to disease (diabetes, heart disease, stroke, cancer, etc), all of which increase the risk of death in COVID19. She also comments that air pollution causes a deregulated immune system, making it more likely to cause damage and lay a foundation for potential chronic diseases.   
@@ -23,14 +26,32 @@ Notes on PM 2.5
 https://scopeblog.stanford.edu/2020/07/17/why-air-pollution-is-linked-to-severe-cases-of-covid-19/#:~:text=Studies%20are%20coming%20out%20that,areas%20of%20high%20pollution%20exposure.&text=This%20study%20and%20others%20have,the%20COVID%2D19%20death%20rate.
 
 *Data*:
-Covid-19 data: Data collected from the new york times dataset
-link here
+Covid-19 data: New York Times data of cumulative counts of Covid-19 cases and deaths by county in the US. This data is compiled from state and local government as well as health departments. 
+https://github.com/nytimes/covid-19-data
 
-EPA data: description
-link here
+EPA data: Annual data taken from EPA's Air database that includes median air quality index values for each year by county. Air quality index (AQI) is a scale that takes into account many different forms of pollution to give an overall rating. Numbers on the low end (0-50) are considered "good" or healthy, whereas higher values (up to 500) are more dangerous for public health. 
+Data: https://aqs.epa.gov/aqsweb/airdata/download_files.html
+AQI: https://www.airnow.gov/aqi/aqi-basics/
 
-PM 2.5 data: description
-link here
+PM 2.5 data: County-level PM2.5 exposure averaged from 2000-2016 taken from the Harvard study exploring PM2.5's link with Covid-19. Data is originally from The Atmospheric Composition Analysis Group at Dalhouse University. PM2.5 is particular pollution size of diameter of ~2.5 micrometers, which are considered fine and easily inhalable. These particles have been shown to be a serious health risk in individuals who are exposed in large amounts or over long periods of time.  
+Study: https://github.com/wxwx1993/PM_COVID
+Data: http://fizz.phys.dal.ca/~atmos/martin/
+PM2.5: https://www.epa.gov/pm-pollution/particulate-matter-pm-basics
+
+*EDA Observations*:
+# We should comment on the data quality here
+We began by exploring the EPA dataset, to get an idea of what patterns exist in the data. To more accurately represent the long term health effects of air quality we calculated the 10 year average of annual air quality. Taking a look at this data we found that an overall average AQI of 36.51012, hawaii had the largest 10 year mean AQI of 136.4, which is likely due to volcanic activity, and a minimum AQI of 0 in a number of counties such as Brunswick, North Carolina. While exploring this data we noticed that a large number of counties were not included. This raised questions about the data, however it is most likely that these counties simply did not have any places where air quality is regularly measured. 
+
+Next we explored the Covid-19 data
+
+
+*Conclusion*:
+We found a correlation between 10 year averaged AQI and Covid-19 cases and deaths by county. These findings are in agreement with the paper that found a relation to Covid-19 outcomes and air pollution. However, we also noted that air pollution is linked to many other factors that may be confounding our results. For example, communities with higher levels of air pollution tend to be poorer communities. Additionally, accross different counties there are varying levels of testing availability, hospital availability, social distancing, and public health information which can all impact the cases and deaths resulting from Covid-19.
+
+https://www.niehs.nih.gov/research/programs/geh/geh_newsletter/2016/4/spotlight/poor_communities_exposed_to_elevated_air_pollution_levels.cfm
+
+*Questions and Future Exploration*:
+
 
 
 ```{r setup, include=FALSE}
@@ -38,7 +59,7 @@ link here
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-We load the libraries here: 
+We load our libraries here: 
 
 ```{r library}
 library(tidyverse)
@@ -78,7 +99,6 @@ theme_common <- function() {
 
 
 ```{r load data}
-
 # Load PM2.5 Data - run this once
 # data originally from The Atmospheric Composition Analysis Group (ACAG) at Dalhouse University (http://fizz.phys.dal.ca/~atmos/martin/)
 url_pm25 <- "https://raw.githubusercontent.com/wxwx1993/PM_COVID/master/Data/county_pm25.csv"
@@ -129,7 +149,7 @@ df_aqi_19_11 <- rbind(df_aqi_19_12, df_airquality2011)
 df_aqi_19_10 <- rbind(df_aqi_19_11, df_airquality2010)
 df_aqi_19_09 <- rbind(df_aqi_19_10, df_airquality2009)
 
-# Import Cenus data
+# Import Census data
 df_pop <- 
   read_csv(
     "data/ACSDT5Y2018.B01003_data_with_overlays_2020-10-07T204051.csv", 
@@ -138,6 +158,7 @@ df_pop <-
   ) %>% 
   mutate(fips = str_sub(id, -5, -1))
 df_pop
+
 
 # Import NYT-covid data
 df_covid <- read_csv(filename_nyt)
